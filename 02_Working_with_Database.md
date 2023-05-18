@@ -439,7 +439,7 @@ php artisan make:controller ListingController --resource
 `web.php`
 ```php
 use App\Http\Controllers\ListingController;
-Route::resource('listings', ListingController::class)
+Route::resource('listing', ListingController::class)
     ->only(['index', 'show']);
 ```
 Route::resource()はLaravelのルーティングメソッドで、特定のリソースコントローラーに対する一連のルート（URLパターン）を自動的に生成します。リソースコントローラーは一般的にCRUD（Create, Read, Update, Delete）オペレーションを処理します。
@@ -456,10 +456,10 @@ php artisan route:list
 ```php
     public function index()
     {
-        return Inertia::render(
-            'Listings/Index',
+        return inertia(
+            'Listing/Index',
             [
-                'listing' => Listing::all(),
+                'listings' => Listing::all()
             ]
         );
     }
@@ -467,22 +467,143 @@ php artisan route:list
     public function show(Listing $listing)
     {
         return Inertia::render(
-            'Listings/Show',
+            'Listing/Show',
             [
-                'listing' => $listing,
+                'listing' => $listing
             ]
         );
     }
 ```
 - indexメソッド:
   - Listing::all()を使ってデータベースから全てのリストアイテムを取得し、Inertia.jsに'Listings/Index'コンポーネントをレンダリングするよう指示しており、その際に全てのリストアイテムをデータとして渡しています。
-  
+
 - showメソッド:
   - メソッドの引数Listing $listingは、LaravelのRoute Model Bindingという機能を用いて、URLから取得したリストアイテムのIDに対応するListingインスタンスを自動的に取得しています。
   - このListingインスタンスを'Listings/Show'コンポーネントに渡しています。
+
+returnに続く、`inertia`と`Inertia::render`の違い
+- `Inertia`はInertiaファサードを使用して指定したビューを返します。Inertiaファサードは、Inertia::renderメソッドを呼び出してビューを返すラッパー。
+- `Inertia::render`は直接Inertia::renderメソッドを使用して指定したビューを返します。ファサードを使用せずに直接メソッドを呼び出しているため、コードがより明示的になる。
   
 
 ## Vueのディレクティブ（v-for, v-bind）とカスタムコンポーネント (Vue Directives(v-for,v-bind) & Custom Components)
+### Vueのディレクティブ (Vue Directives)
+- v-forディレクティブ
+  - v-forディレクティブは、配列の各要素に対して繰り返し処理を行うためのものです。v-forディレクティブは、配列の各要素に対して繰り返し処理を行うためのものです。
+- v-bindディレクティブ
+  - v-bindディレクティブは、HTML要素の属性に対して、Vueのデータをバインドするためのものです。
+  - :で省略可能
+
+`Listings/Index.vue`
+```vue
+<script setup>
+import {Link} from '@inertiajs/inertia-vue3'
+
+defineProps({
+  listings: Array,
+})
+</script>
+
+<template>
+  <div v-for="listing in listings" :key="listing.id">
+  <Link :href="`/listing/${listing.id}`">
+    {{ listing.property_name }}
+    {{ listing.year_built }}
+    {{ listing.postal_code }}
+    {{ listing.prefecture }}
+    {{ listing.city }}
+    {{ listing.address1 }}
+  </Link>
+  </div>
+</template>
+```
+definePropsで`ListingController.php`から渡された、listingsをArrayで受け取る。
+また配列で定義されているlistingsの各要素に対して、v-forディレクティブを使って繰り返し処理。
+
+`Listings/Show.vue`
+```vue
+<script setup>
+import {Link} from '@inertiajs/inertia-vue3'
+
+defineProps({
+  listings: Array,
+})
+</script>
+
+<template>
+  <div v-for="listing in listings" :key="listing.id">
+    <Link :href="`/listing/${listing.id}`">
+      {{ listing.property_name }}
+      {{ listing.year_built }}
+      {{ listing.postal_code }}
+      {{ listing.prefecture }}
+      {{ listing.city }}
+      {{ listing.address1 }}
+    </Link>
+  </div>
+</template>
+```
+definePropsで`ListingController.php`から渡された、listingsをObjectで受け取る。
+
+### 上記の共通部分をコンポーネント化 (Creating a Component)
+`Components/ListingAddress.vue`
+```vue
+<script setup>
+defineProps({
+  listing: Object,
+})
+</script>
+
+<template>
+  <div>
+    {{ listing.property_name }}
+    {{ listing.year_built }}
+    {{ listing.postal_code }}
+    {{ listing.prefecture }}
+    {{ listing.city }}
+    {{ listing.address1 }}
+  </div>
+</template>
+```
+
+`Listings/Index.vue`
+```vue
+<script setup>
+import {Link} from '@inertiajs/inertia-vue3'
+import ListingAddress from '../../Components/ListingAddress.vue';
+
+defineProps({
+  listings: Array,
+})
+</script>
+
+<template>
+  <div v-for="listing in listings" :key="listing.id">
+    <Link :href="`/listing/${listing.id}`">
+      <ListingAddress :listing="listing" />
+    </Link>
+  </div>
+</template>
+```
+
+`Listings/Show.vue`
+```vue
+<script setup>
+import ListingAddress from '../../Components/ListingAddress.vue';
+
+defineProps({
+  listing: Object,
+})
+</script>
+
+<template>
+  <div>
+    <ListingAddress :listing="listing" />
+  </div>
+</template>
+```
+
+
 ## フォームの処理（useForm、v-model） (Handling Forms(useForm,v-model))
 ## Laravelでのフォームの処理 (Handling Forms in Laravel)
 ## ミドルウェアと全ページでのデータ共有 (Middlewares and Sharing Data with All Pages)

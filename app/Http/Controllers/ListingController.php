@@ -16,9 +16,9 @@ class ListingController extends Controller
     public function index()
     {
         return Inertia::render(
-            'Listings/Index',
+            'Listing/Index',
             [
-                'listing' => Listing::all(),
+                'listings' => Listing::all()
             ]
         );
     }
@@ -47,16 +47,17 @@ class ListingController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $id Listing ID
      * @return \Illuminate\Http\Response
+     *
      * 
      */
     public function show(Listing $listing)
     {
         return Inertia::render(
-            'Listings/Show',
+            'Listing/Show',
             [
-               'Listing' => $listing,
+                'listing' => $listing
             ]
         );
     }
