@@ -23,6 +23,149 @@ composer.jsonの"scripts"セクションの"post-update-cmd"に"@php artisan ide
 ```
 
 ## データベースへの接続 (Connecting to the Database)
+### docker-compose.ymlの作成 (Creating docker-compose.yml)
+[Dockerについての解説](https://fadocodecamp.com/running-a-mysql-database-with-docker-compose-a-beginners-guide/)
+```yml
+version: "3.9"
+services:
+  mysql:
+    image: mariadb:10.8.3
+    # Appleシリコンの場合以下を追加
+    platform: linux/arm64/v8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+```
+Docker Composeを使ってMySQL（ここではMariaDBのイメージを使用）とAdminerを立ち上げるための設定
+
+この**`docker-compose.yml`**ファイルは、Docker Composeを使ってMySQL（ここではMariaDBのイメージを使用）とAdminerを立ち上げるための設定が書かれています。
+
+各行の詳細は以下：
+
+```yaml
+version: "3.9"
+
+```
+この行は、使用するDocker Composeのバージョンを指定しています。ここではバージョン3.9を使用しています。
+
+```yaml
+services:
+
+```
+この行からは、起動するサービス（Dockerコンテナ）の定義が始まります。
+
+```yaml
+  mysql:
+
+```
+この行は、MariaDB（MySQLのフォークで完全互換）のコンテナを定義しています。
+
+```yaml
+    image: mariadb:10.8.3
+
+```
+MariaDBのバージョン10.8.3のイメージを指定しています。
+
+```yaml
+    platform: linux/arm64/v8
+
+```
+この行は、Apple Silicon（M1チップなど）で動作させる場合に必要な設定です。これにより、ARM64アーキテクチャのLinuxをターゲットとします。
+
+```yaml
+    command: --default-authentication-plugin=mysql_native_password
+
+```
+MariaDBコンテナ起動時に実行されるコマンドです。ここでは、デフォルトの認証プラグインを**`mysql_native_password`**に設定しています。
+
+```yaml
+    restart: always
+
+```
+この行は、コンテナが何らかの理由で終了した場合に、常に自動的に再起動するように設定しています。
+
+```yaml
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+```
+環境変数を設定しています。ここでは、MariaDBのrootユーザのパスワードを**`root`**に設定しています。
+
+```yaml
+    ports:
+      - 3306:3306
+
+```
+ホストマシンのポート3306を、コンテナ内のポート3306にマッピング（つなげる）設定をしています。
+
+```yaml
+  adminer:
+
+```
+Adminer（データベースの管理ツール）のコンテナを定義しています。
+
+```yaml
+    image: adminer
+
+```
+Adminerの最新バージョンのイメージを使用します。
+
+```yaml
+    restart: always
+
+```
+Adminerコンテナも何らかの理由で終了した場合に常に自動的に再起動するように設定しています。
+
+```yaml
+    ports:
+      - 8080:8080
+
+```
+ホストマシンのポート8080を、Adminerコンテナ内のポート8080にマッピングしています。
+
+### Dockerコンテナの起動 (Starting Docker Containers)
+```terminal
+docker-compose up -d
+```
+
+### Laravelのデータベース設定 (Laravel Database Configuration)
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_vue_property
+DB_USERNAME=root
+DB_PASSWORD=root
+```
+
+### Adminerの利用 (Using Adminer)
+http://localhost:8080/ にアクセスすると、Adminerが起動します。
+- データベース種類：MySQL
+- サーバー：mysql
+- ユーザー名：root
+- パスワード：root
+
+にてログインすると、データベースの管理画面が表示されます。
+
+MySQLサービスは mysql という名前でホストされていると想定されます。したがって、PHPアプリケーションからデータベースに接続する際、ホスト名として mysql を使用する必要があります。
+
+### データベースの作成 (Creating a Database)
+- データベース名:laravel_vue_property
+- 文字コード:utf8mb4_general_ci
+
+### DB接続の確認 (Checking the DB)
+```terminal
+php artisan db:show
+```
+
 ## モデルとマイグレーション (Models and Migrations)
 ## マイグレーションの操作 (Working with Migrations)
 ## モデルファクトリとシーダー (Model Factorise & Seeders)
