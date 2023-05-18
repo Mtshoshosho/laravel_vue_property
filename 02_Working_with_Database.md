@@ -221,7 +221,7 @@ php artisan migrate:rollback
 | city | string | 50 | 市区町村 |
 | address1 | string | 50 | 市区町村以下の住所 |
 | nearest_station | string | 100 | 最寄駅 |
-| floor | unsigned integer | - | 建物の階数 |
+| specific_floor | unsigned integer | - | 建物の階数 |
 | rent | unsigned integer | - | 賃料 |
 | administration_fee | unsigned integer | - | 管理費 |
 | security_deposit | unsigned integer | - | 敷金 |
@@ -233,16 +233,66 @@ php artisan migrate:rollback
   このメソッドはマイグレーションが実行されるときに呼び出されます。データベースのテーブルを新規作成したり、テーブル構造を変更したり、データを挿入したりするような操作をここに記述します。
 
 `down`メソッド：
-  このメソッドはマイグレーションがロールバック（元に戻す操作）されるときに呼び出されます。**`up`**メソッドで行った操作を元に戻すための操作をここに記述します。例えば、**`up`**メソッドでテーブルを新規作成した場合、**`down`**メソッドではそのテーブルを削除します
+  このメソッドはマイグレーションがロールバック（元に戻す操作）されるときに呼び出されます。upメソッドで行った操作を元に戻すための操作をここに記述します。例えば、upメソッドでテーブルを新規作成した場合、downメソッドではそのテーブルを削除します
 
 ### マイグレーションの実行 (Running Migrations)
 ```terminal
 php artisan migrate
 ```
-マイグレーションを実行すると、**`up`**メソッドで定義された内容が実行される。
-
+マイグレーションを実行すると、upメソッドで定義された内容が実行される。
 
 ## モデルファクトリとシーダー (Model Factorise & Seeders)
+### config/app.phpの編集 (Editing config/app.php)
+```php
+'faker_locale' => 'ja_JP',
+```
+**`'faker_locale' => 'ja_JP',`**を追加することで、日本語のダミーデータが生成されるようになる。
+
+### モデルファクトリの作成 (Creating a Model Factory)
+```terminal
+php artisan make:factory ListingFactory
+```
+Listingモデルに関連するモデルファクトリを作成するためのコマンド
+
+### モデルファクトリの内容　(Contents of a Model Factory)
+| フィールド名 | データ型 | データ例 |
+| --- | --- | --- |
+| property_name | 文字列 | ハイツ、コーポ、メゾンのいずれか＋ランダムな名前＋1~9の数字＋0＋1~9の数字 |
+| year_built | 整数 | 0~50のランダムな数字 |
+| postal_code | 文字列 | ランダムな郵便番号 |
+| prefecture | 文字列 | ランダムな都道府県名 |
+| city | 文字列 | ランダムな市区町村名 |
+| address1 | 文字列 | ランダムな住所 |
+| nearest_station | 文字列 | ランダムな名前＋'駅' |
+| specific_floor | 整数 | 1~10のランダムな数字 |
+| rent | 整数 | 50000~300000のランダムな数字 |
+| administration_fee | 整数 | 5000~20000のランダムな数字 |
+| security_deposit | 整数 | 10000~50000のランダムな数字 |
+| gratuity_fee | 整数 | 0~50000のランダムな数字 |
+| floor_plan | 文字列 | 1R, 1K, 1DK, 1LDK, 2K, 2DK, 2LDK, 3DK, 3LDK, 4DK, 4LDK のいずれか |
+| exclusive_area | 浮動小数点数 | 20~200の範囲でランダムな2桁の小数 |
+
+### シーダーのによるデータ挿入 (Inserting Data with Seeders)
+```php
+public function run()
+{
+  \App\Models\Listing::factory(20)->create();
+}
+```
+Listingモデルファクトリを20回実行し、Listingモデルに20件のダミーデータを挿入する。
+- [Seederについて](https://laravel.com/docs/9.x/seeding)
+- [Seederを動かす為に](https://laravel.com/docs/9.x/seeding#running-seeders)
+
+### シーダーを実行してだみーデータを挿入 (Running Seeders)
+```terminal
+php artisan db:seed
+```
+
+### マイグレーションファイルをロースバックしデータを再生成 (Rolling Back Migrations and Re-Seeding)
+```terminal
+php artisan migrate:refresh --seed
+```
+
 ## データベースへのクエリ (Querying the Database)
 ## データの更新と挿入、マスアサインメント (Updating and Inserting Data,Mass Assignment)
 ## リソースコントローラとルートモデルバインディング (Resource Controller and Route Model Binding)
