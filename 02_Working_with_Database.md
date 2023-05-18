@@ -342,12 +342,78 @@ asc(昇順)かdesc(降順)で、ソートすることができる。
 [データベース：クエリビルダ(Database: Query Builder)](https://laravel.com/docs/9.x/queries#main-content)
 
 
-### 
-
-
-
-
 ## データの更新と挿入、マスアサインメント (Updating and Inserting Data,Mass Assignment)
+### データの更新 (Updating Data)
+更新したいデータを取得
+```powershell
+$listing = Listing::find(1)
+```
+
+更新したいデータを取得した後、更新したいフィールドを指定して更新する。
+```powershell
+$listing->prefecture = '山本県';
+$listing->property_name = 'コーポ山ちゃん101';
+$listing->specific_floor = 10;
+$listing->floor_plan = '4DK';
+```
+
+更新したデータを保存
+```powershell
+$listing->save()
+```
+
+### createメソッドを用いて、新たなレコードをデータベースに挿入 (Inserting Data with the create Method)
+```php
+class Listing extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'property_name',
+        'year_built',
+        'postal_code',
+        'prefecture',
+        'city',
+        'address1',
+        'nearest_station',
+        'specific_floor',
+        'rent',
+        'administration_fee',
+        'security_deposit',
+        'gratuity_fee',
+        'floor_plan',
+        'exclusive_area',
+    ];
+}
+```
+
+```powershell
+Listing::create([
+  'property_name' => 'コーポ山ちゃん101',
+  'year_built' => 30,
+  'postal_code' => '1234567',
+  'prefecture' => '山本県',
+  'city' => '山本市',
+  'address1' => '山本町1-1-1',
+  'nearest_station' => '山本駅',
+  'specific_floor' => 10,
+  'rent' => 100000,
+  'administration_fee' => 10000,
+  'security_deposit' => 100000,
+  'gratuity_fee' => 0,
+  'floor_plan' => '4DK',
+  'exclusive_area' => 100.00,
+]);
+```
+**Listing::create()**メソッドを用いて、新たなレコードをデータベースに挿入します。
+
+ここで使用されている **$fillable**プロパティは、Eloquentがデータベースに挿入または更新を許可するフィールドを定義します。これは一種のホワイトリストで、これに含まれているフィールドのみが**create()**や**update()**メソッドで設定可能です。
+
+**Listing::create()**メソッドに渡されている配列は、データベースに挿入する新たなレコードの値を定義しています。各キーはデータベースのフィールド名に対応し、その値がそのフィールドに挿入される値です。
+
+あなたが共有したスクリーンショットからは、新たに挿入されたレコードがデータベース（具体的には**listings**テーブル）に反映されていることが確認できます。このレコードは、上記の**Listing::create()**メソッドにより作成されたものと思われます。
+
+
 ## リソースコントローラとルートモデルバインディング (Resource Controller and Route Model Binding)
 ## Vueのディレクティブ（v-for, v-bind）とカスタムコンポーネント (Vue Directives(v-for,v-bind) & Custom Components)
 ## フォームの処理（useForm、v-model） (Handling Forms(useForm,v-model))

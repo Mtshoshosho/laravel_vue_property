@@ -74,7 +74,7 @@ return new class extends Migration
                 'city',
                 'address1',
                 'nearest_station',
-                'floor',
+                'specific_floor',
                 'rent',
                 'administration_fee',
                 'security_deposit',
