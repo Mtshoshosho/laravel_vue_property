@@ -275,6 +275,7 @@ Listingモデルに関連するモデルファクトリを作成するための�
 | exclusive_area | 浮動小数点数 | 20~200の範囲でランダムな2桁の小数 |
 
 ### シーダーのによるデータ挿入 (Inserting Data with Seeders)
+`database/seeders/DatabaseSeeder.php`
 ```php
 public function run()
 {
@@ -363,6 +364,7 @@ $listing->save()
 ```
 
 ### createメソッドを用いて、新たなレコードをデータベースに挿入 (Inserting Data with the create Method)
+`App\Models\Listing.php`
 ```php
 class Listing extends Model
 {
@@ -405,16 +407,81 @@ Listing::create([
   'exclusive_area' => 100.00,
 ]);
 ```
-**Listing::create()**メソッドを用いて、新たなレコードをデータベースに挿入します。
+Listing::create()メソッドを用いて、新たなレコードをデータベースに挿入します。
 
-ここで使用されている **$fillable**プロパティは、Eloquentがデータベースに挿入または更新を許可するフィールドを定義します。これは一種のホワイトリストで、これに含まれているフィールドのみが**create()**や**update()**メソッドで設定可能です。
+ここで使用されている$fillableプロパティは、Eloquentがデータベースに挿入または更新を許可するフィールドを定義します。これは一種のホワイトリストで、これに含まれているフィールドのみがcreate()やupdate()メソッドで設定可能です。
 
-**Listing::create()**メソッドに渡されている配列は、データベースに挿入する新たなレコードの値を定義しています。各キーはデータベースのフィールド名に対応し、その値がそのフィールドに挿入される値です。
+Listing::create()メソッドに渡されている配列は、データベースに挿入する新たなレコードの値を定義しています。各キーはデータベースのフィールド名に対応し、その値がそのフィールドに挿入される値です。
 
-あなたが共有したスクリーンショットからは、新たに挿入されたレコードがデータベース（具体的には**listings**テーブル）に反映されていることが確認できます。このレコードは、上記の**Listing::create()**メソッドにより作成されたものと思われます。
+あなたが共有したスクリーンショットからは、新たに挿入されたレコードがデータベース（具体的にはlistingsテーブル）に反映されていることが確認できます。このレコードは、上記のListing::create()メソッドにより作成されたものと思われます。
 
 
 ## リソースコントローラとルートモデルバインディング (Resource Controller and Route Model Binding)
+### リソースコントローラの作成 (Creating a Resource Controller)
+```terminal
+php artisan make:controller ListingController --resource
+```
+リソースコントローラが処理するアクションと、それに対応するHTTPメソッドとURLの例
+| メソッド名 | 概要 | 対応するHTTPメソッド | URL例 |
+| --- | --- | --- | --- |
+| index | リソースの一覧を表示 | GET | /listings |
+| create | 新規作成フォームを表示 | GET | /listings/create |
+| store | 新規リソースを保存 | POST | /listings |
+| show | 特定のリソースを表示 | GET | /listings/{listing} |
+| edit | 編集フォームを表示 | GET | /listings/{listing}/edit |
+| update | 特定のリソースを更新 | PUT/PATCH | /listings/{listing} |
+| destroy | 特定のリソースを削除 | DELETE | /listings/{listing} |
+
+
+[リソースコントローラのドキュメント](https://laravel.com/docs/9.x/controllers#actions-handled-by-resource-controller)
+
+### ルートモデルバインディング (Route Model Binding)
+`web.php`
+```php
+use App\Http\Controllers\ListingController;
+Route::resource('listings', ListingController::class)
+    ->only(['index', 'show']);
+```
+Route::resource()はLaravelのルーティングメソッドで、特定のリソースコントローラーに対する一連のルート（URLパターン）を自動的に生成します。リソースコントローラーは一般的にCRUD（Create, Read, Update, Delete）オペレーションを処理します。
+
+ListingControllerに対する一連のルートが生成されますが、onlyメソッドにより、生成されるルートは 'index' と 'show' の2つだけに限定されます。これは、リソースの全CRUD操作を公開するのではなく、特定の操作のみを公開したい場合に便利。
+
+### ルートモデルバインディングの確認 (Checking Route Model Binding)
+```terminal
+php artisan route:list
+```
+
+### ルートモデルバインディングの実装 (Implementing Route Model Binding)
+`app/Http/Controllers/ListingController.php`
+```php
+    public function index()
+    {
+        return Inertia::render(
+            'Listings/Index',
+            [
+                'listing' => Listing::all(),
+            ]
+        );
+    }
+
+    public function show(Listing $listing)
+    {
+        return Inertia::render(
+            'Listings/Show',
+            [
+                'listing' => $listing,
+            ]
+        );
+    }
+```
+- indexメソッド:
+  - Listing::all()を使ってデータベースから全てのリストアイテムを取得し、Inertia.jsに'Listings/Index'コンポーネントをレンダリングするよう指示しており、その際に全てのリストアイテムをデータとして渡しています。
+  
+- showメソッド:
+  - メソッドの引数Listing $listingは、LaravelのRoute Model Bindingという機能を用いて、URLから取得したリストアイテムのIDに対応するListingインスタンスを自動的に取得しています。
+  - このListingインスタンスを'Listings/Show'コンポーネントに渡しています。
+  
+
 ## Vueのディレクティブ（v-for, v-bind）とカスタムコンポーネント (Vue Directives(v-for,v-bind) & Custom Components)
 ## フォームの処理（useForm、v-model） (Handling Forms(useForm,v-model))
 ## Laravelでのフォームの処理 (Handling Forms in Laravel)
