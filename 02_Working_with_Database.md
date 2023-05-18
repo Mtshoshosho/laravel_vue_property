@@ -1,16 +1,25 @@
 ## Laravel DebugbarとIDEヘルパー (Laravel Debugbar &IDE Helper)
+
 ### Debugbarのインストール (Installing Debugbar)
+
 ```terminal
 composer require barryvdh/laravel-debugbar --dev
 ```
+
 .envファイルのAPP_DEBUGをtrueにする
+
 [Debugbarについて](https://github.com/barryvdh/laravel-debugbar)
+
 ### IDE Helperのインストール (Installing IDE Helper)
+
 ```terminal
 composer require --dev barryvdh/laravel-ide-helper
 ```
+
 [IDE Helperについて](https://github.com/barryvdh/laravel-ide-helper)
+
 IDE Helperパッケージを使用して補助情報ファイルを生成
+
 ```terminal
 php artisan ide-helper:generate
 ```
