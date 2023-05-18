@@ -81,7 +81,6 @@ return new class extends Migration
                 'gratuity_fee',
                 'floor_plan',
                 'exclusive_area',
-
             ]);
         });
     }
