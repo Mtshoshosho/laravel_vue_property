@@ -30,6 +30,7 @@ composer.jsonの"scripts"セクションの"post-update-cmd"に"@php artisan ide
 "@php artisan ide-helper:meta"
 ```
 
+
 ## データベースへの接続 (Connecting to the Database)
 ### docker-compose.ymlの作成 (Creating docker-compose.yml)
 [Dockerについての解説](https://fadocodecamp.com/running-a-mysql-database-with-docker-compose-a-beginners-guide/)
@@ -174,13 +175,13 @@ MySQLサービスは mysql という名前でホストされていると想定�
 php artisan db:show
 ```
 
+
 ## モデルとマイグレーション (Models and Migrations)
 ### modelとmigrationの作成 (Creating a Model and Migration)
 ```terminal 
 php artisan make:model Listing -m
 ```
 **Listing**という名前のモデルを作成し、同時にそれに関連する新しいデータベースのマイグレーションファイルを生成します。-mオプションは、"マイグレーションを作成する"という意味
-
 
 [モデルクラスを生成する(Generating Model Classes)](https://laravel.com/docs/9.x/eloquent#table-names)
 
@@ -241,6 +242,7 @@ php artisan migrate
 ```
 マイグレーションを実行すると、upメソッドで定義された内容が実行される。
 
+
 ## モデルファクトリとシーダー (Model Factorise & Seeders)
 ### config/app.phpの編集 (Editing config/app.php)
 ```php
@@ -293,7 +295,58 @@ php artisan db:seed
 php artisan migrate:refresh --seed
 ```
 
+
 ## データベースへのクエリ (Querying the Database)
+### laravel/tinkerをプロジェクトに追加するコマンド
+```terminal
+composer require laravel/tinker
+```
+
+### Laravel\Tinker\TinkerServiceProviderが提供する設定ファイルを、Laravelアプリケーションの設定ディレクトリにコピーするコマンド
+```terminal
+php artisan vendor:publish --provider="Laravel\Tinker\TinkerServiceProvider"
+```
+
+### tinkerの起動
+```terminal
+php artisan tinker
+```
+
+### Listingモデルのデータを全件取得
+```powershell
+Listing::all()
+```
+
+### ListingモデルのIDを指定したデータを取得
+```powershell
+Listing::find(1)
+```
+
+### Listingモデルでwhere句を使用してデータを取得
+```powershell
+Listing::where('prefecture', '東京都')->get()
+```
+`get()`メソッドをつけなかった場合、Listing::where('prefecture', '東京都');というコードはただのクエリビルダインスタンス(Illuminate\Database\Eloquent\Builder)を返すだけで、実際にデータを取得することはできない。
+
+### Listingモデルでwhereで複数の条件を指定してデータを取得
+```powershell
+Listing::where('prefecture', '東京都')->where('floor_plan', '4DK')->get()
+```
+
+### Listingモデルでwhereで複数の条件を指定してorderByで並び替えてデータを取得
+```powershell
+Listing::where('year_built', '>', 25)->where('floor_plan', '4DK')->orderBy('rent', 'desc')->get()
+```
+asc(昇順)かdesc(降順)で、ソートすることができる。
+
+[データベース：クエリビルダ(Database: Query Builder)](https://laravel.com/docs/9.x/queries#main-content)
+
+
+### 
+
+
+
+
 ## データの更新と挿入、マスアサインメント (Updating and Inserting Data,Mass Assignment)
 ## リソースコントローラとルートモデルバインディング (Resource Controller and Route Model Binding)
 ## Vueのディレクティブ（v-for, v-bind）とカスタムコンポーネント (Vue Directives(v-for,v-bind) & Custom Components)
