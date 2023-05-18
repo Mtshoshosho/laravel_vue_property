@@ -605,6 +605,82 @@ defineProps({
 
 
 ## フォームの処理（useForm、v-model） (Handling Forms(useForm,v-model))
+### Createメソッド (Create Method)
+`web.php`
+```php
+Route::resource('listing', ListingController::class)
+    ->only(['index', 'show', 'create']);
+```
+createメソッドを追加
+
+`Controllers/ListingController.php`
+```php
+    public function create()
+    {
+        return Inertia::render(
+            'Listing/Create',
+        );
+    }
+```
+createメソッドを追加
+
+### フォームの送信 (Submitting the Form)
+`resources/js/Pages/Listing/Create.vue`
+```vue
+<script setup>
+import { useForm } from '@inertiajs/inertia-vue3'
+const form = useForm({
+  property_name: null,
+  year_built: null,
+  postal_code: null,
+  prefecture: null,
+  city: null,
+  address1: null,
+  nearest_station: null,
+  specific_floor: null,
+  rent: 0,
+  administration_fee: 0,
+  security_deposit: 0,
+  gratuity_fee: 0,
+  floor_plan: null,
+  exclusive_area: 0.00,
+});
+const create = () => form.post('/listing')
+</script>
+
+<template>
+  <form @submit.prevent="create">
+    <div>
+      <div>
+        <label>物件名</label>
+        <input v-model="form.property_name" type="text" />
+      </div>
+
+      <div>
+        <button type="submit">登録</button>
+      </div>
+    </div>
+  </form>
+</template>
+```
+Vueのディレクティブ (Vue Directives)
+- v-modelディレクティブ
+  - v-modelディレクティブは、フォームの入力値をVueのデータにバインドするためのものです。
+  - [フォーム入力バインディング(Form Input Bindings)](https://vuejs.org/guide/essentials/forms.html#text)
+  - [v-model修飾子](https://vuejs.org/guide/essentials/forms.html#number)
+これにより、フォームの入力値をuseFormで定義したformオブジェクトのプロパティにバインドすることができる。
+また、`@submit`がによって、`<button type="submit">`がクリックされた時に、`create関数`が呼び出される。さらに、`prevent `イベント修飾子をつけることにより、フォームの`submit`イベントが発生したときにブラウザのデフォルトの送信動作（ページの再読み込みなど）を防ぐことができる。
+
+
+`reactive`はVue3のComposition APIの一部であり、リアクティブなオブジェクトを作成するためのものです。つまり、オブジェクトのプロパティが変更されると、それを参照している全てのコンポーネントが自動的に再レンダリングされます。
+
+`useForm`は特定のパッケージやライブラリ（この場合はvue-final-formまたはvee-validateなど）が提供するフックであり、リアクティブなフォームの状態を簡単に管理するためのものです。useFormは内部的にはreactiveを使用しているかもしれませんが、フォームを扱う際に追加の便利な機能（バリデーション、エラーメッセージの管理、フォームのリセット、非同期の送信など）を提供します。
+
+よって、`useForm`を使用し、`form.post('/listing')`とする理由は、こうすることでフォームの送信とその結果のハンドリング（成功やエラー）を簡単に管理できるからです。特に、バリデーションエラーの管理や送信後のフォームリセットなど、フォームに関連する複雑なタスクを簡単に行えるので、コードの可読性と保守性が向上します。
+
+
+
+
 ## Laravelでのフォームの処理 (Handling Forms in Laravel)
 ## ミドルウェアと全ページでのデータ共有 (Middlewares and Sharing Data with All Pages)
 ## 計算データと条件付きレンダリング（フラッシュメッセージの表示） (Computed Data and Conditional Rendering(Displaying Flash Messages))
