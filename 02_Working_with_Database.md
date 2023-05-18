@@ -1,5 +1,4 @@
 ## Laravel DebugbarとIDEヘルパー (Laravel Debugbar &IDE Helper)
-
 ### Debugbarのインストール (Installing Debugbar)
 
 ```terminal
@@ -180,10 +179,68 @@ php artisan db:show
 ```terminal 
 php artisan make:model Listing -m
 ```
+**Listing**という名前のモデルを作成し、同時にそれに関連する新しいデータベースのマイグレーションファイルを生成します。-mオプションは、"マイグレーションを作成する"という意味
+
+
 [モデルクラスを生成する(Generating Model Classes)](https://laravel.com/docs/9.x/eloquent#table-names)
 
 
 ## マイグレーションの操作 (Working with Migrations)
+### マイグレーションの実行 (Running Migrations)
+```terminal
+php artisan migrate
+```
+まだ適用されていないマイグレーションをデータベースに適用します。
+
+### フィールドを追加 (Adding Fields)
+```terminal
+php artisan make:migration add_fields_to_listings_table
+```
+既存のlistingsテーブルに新しいフィールドを追加したり、既存のフィールドを変更したりするためのマイグレーションファイルを作成します。
+
+マイグレーションファイルの実行状態の確認
+```terminal
+php artisan migrate:status
+```
+すると上記で追加したマイグレーションファイルが未実行の状態(**Pending**)になっている。
+
+
+### マイグレーションのロールバック (Rolling Back Migrations)
+```terminal
+php artisan migrate:rollback
+```
+最後に実行されたマイグレーションをロールバックします。すると、上記で追加した未実行の状態(**Pending**)のマイグレーションファイルが消えている。
+
+### 追加したフィールドの内容　(Contents of a Migration File)
+| フィールド名 | 型 | 長さ | 説明 |
+| --- | --- | --- | --- |
+| property_name | string | 100 | 物件名 |
+| year_built | unsigned integer | - | 築年数 |
+| postal_code | string | 7 | 郵便番号 |
+| prefecture | string | 10 | 都道府県 |
+| city | string | 50 | 市区町村 |
+| address1 | string | 50 | 市区町村以下の住所 |
+| nearest_station | string | 100 | 最寄駅 |
+| floor | unsigned integer | - | 建物の階数 |
+| rent | unsigned integer | - | 賃料 |
+| administration_fee | unsigned integer | - | 管理費 |
+| security_deposit | unsigned integer | - | 敷金 |
+| gratuity_fee | unsigned integer | - | 礼金 |
+| floor_plan | string | 50 | 間取り |
+| exclusive_area | decimal | 8,2 | 専有面積 |
+
+- **`up`**メソッド：
+  - このメソッドはマイグレーションが実行されるときに呼び出されます。データベースのテーブルを新規作成したり、テーブル構造を変更したり、データを挿入したりするような操作をここに記述します。
+- **`down`**メソッド：
+  - このメソッドはマイグレーションがロールバック（元に戻す操作）されるときに呼び出されます。**`up`**メソッドで行った操作を元に戻すための操作をここに記述します。例えば、**`up`**メソッドでテーブルを新規作成した場合、**`down`**メソッドではそのテーブルを削除します
+
+### マイグレーションの実行 (Running Migrations)
+```terminal
+php artisan migrate
+```
+マイグレーションを実行すると、**`up`**メソッドで定義された内容が実行される。
+
+
 ## モデルファクトリとシーダー (Model Factorise & Seeders)
 ## データベースへのクエリ (Querying the Database)
 ## データの更新と挿入、マスアサインメント (Updating and Inserting Data,Mass Assignment)
