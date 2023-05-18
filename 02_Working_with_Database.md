@@ -167,6 +167,13 @@ php artisan db:show
 ```
 
 ## モデルとマイグレーション (Models and Migrations)
+### modelとmigrationの作成 (Creating a Model and Migration)
+```terminal 
+php artisan make:model Listing -m
+```
+[モデルクラスを生成する(Generating Model Classes)](https://laravel.com/docs/9.x/eloquent#table-names)
+
+
 ## マイグレーションの操作 (Working with Migrations)
 ## モデルファクトリとシーダー (Model Factorise & Seeders)
 ## データベースへのクエリ (Querying the Database)
